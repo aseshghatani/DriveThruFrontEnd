@@ -10,6 +10,8 @@ import Profile from "./pages/Profile";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 import MenuPage from "./pages/MenuPage";
+import HomePage from "./pages/HomePage";
+import Restaurant from "./pages/Restaurant";
 
 function App() {
   const theme = createTheme({
@@ -42,6 +44,15 @@ function App() {
                 </ProtectedRoute>
               }
             />
+            <Route
+              path="/"
+              element={
+                <ProtectedRoute>
+                  <HomePage />
+                </ProtectedRoute>
+              }
+            />
+            <Route path="/restaurants" element={<Restaurant />} />
             <Route path="/menu" element={<MenuPage />} />
           </Routes>
         </CssBaseline>

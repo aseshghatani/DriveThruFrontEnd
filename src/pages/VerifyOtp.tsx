@@ -29,7 +29,7 @@ export default function VerifyOtp() {
         const { token, user } = response.data.data;
         localStorage.setItem("token", token);
         localStorage.setItem("user", JSON.stringify(user));
-        navigate("/menu", {
+        navigate("/", {
           state: { token: token },
           replace: true,
         });

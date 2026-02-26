@@ -24,12 +24,15 @@ function Navbar() {
       setUser(JSON.parse(storedUser));
       setCheckUser(true);
     }
-  });
+  }, []);
 
   const handleClick = () => {
     if (checkUser) {
       navigate("/profile");
     }
+  };
+  const handleHome = () => {
+    navigate("/");
   };
 
   return (
@@ -43,8 +46,22 @@ function Navbar() {
               alignItems: "center",
             }}
           >
-            <Typography variant="h3">DriveThru</Typography>
-            {checkUser && <Typography variant="h4">{user?.name}</Typography>}
+            <Typography
+              sx={{ cursor: "pointer" }}
+              onClick={handleHome}
+              variant="h3"
+            >
+              DriveThru
+            </Typography>
+            {checkUser && (
+              <Typography
+                sx={{ cursor: "pointer" }}
+                onClick={handleClick}
+                variant="h4"
+              >
+                {user?.name}
+              </Typography>
+            )}
           </Box>
         </Container>
       </Box>
