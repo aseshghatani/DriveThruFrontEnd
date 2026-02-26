@@ -9,20 +9,33 @@ import {
   Typography,
 } from "@mui/material";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 function Home() {
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const handleSendOtp = async () => {
     try {
-      const response = await axios.post("http://localhost:8080/auth/send-otp", {
-        email: email,
-      });
-      console.log(email);
-      console.log(response);
+      const response = await axios.post(
+        "http://localhost:8080/auth/send-otp",
+        {
+          to: email,
+        },
+        {
+          headers: { "Content-Type": "application/json" },
+        },
+      );
+      if (response.data.success) {
+        navigate("/verify-otp", {
+          state: { mail: email, success: response.data.success },
+          replace: true,
+        });
+      }
     } catch (error) {
       console.log(error);
       alert("failed to send otp");
     }
+    console.log(email);
   };
 
   return (
@@ -41,6 +54,7 @@ function Home() {
               label="email"
               onChange={(e) => setEmail(e.target.value)}
             />
+
             <Button variant="contained" sx={{ mt: 2 }} onClick={handleSendOtp}>
               Send Otp
             </Button>
