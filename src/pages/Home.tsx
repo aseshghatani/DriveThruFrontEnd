@@ -40,6 +40,7 @@ function Home() {
 
   return (
     <>
+      <Navbar />
       <Container sx={{ mt: 5, p: 2 }}>
         <Box>
           <Typography variant="h4">Login/Register</Typography>

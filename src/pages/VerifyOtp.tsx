@@ -2,6 +2,7 @@ import { Box, Button, Container, TextField, Typography } from "@mui/material";
 import axios from "axios";
 import React, { useState } from "react";
 import { Navigate, useLocation, useNavigate } from "react-router-dom";
+import Navbar from "../components/Navbar";
 
 export default function VerifyOtp() {
   const [code, setCode] = useState("");
@@ -52,6 +53,7 @@ export default function VerifyOtp() {
   return (
     <div>
       <>
+        <Navbar />
         <Container sx={{ mt: 5, p: 2 }}>
           <Box>
             <Typography variant="h4">Login/Register</Typography>

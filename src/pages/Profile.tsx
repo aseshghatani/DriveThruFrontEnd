@@ -1,6 +1,7 @@
 import { Box, Button, Container, TextField, Typography } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import Navbar from "../components/Navbar";
 
 interface User {
   id: number;
@@ -24,6 +25,8 @@ export default function Profile() {
     setUser(JSON.parse(storedUser));
   }, [navigate]);
   const handleLogOut = () => {
+    const confirmed = window.confirm("Are you sure you want to Log out");
+    if (!confirmed) return;
     localStorage.removeItem("user");
     localStorage.removeItem("token");
     navigate("/send-otp", { replace: true });
@@ -33,6 +36,7 @@ export default function Profile() {
   }
   return (
     <>
+      <Navbar />
       <Container sx={{ mt: 3 }}>
         <Typography variant="h2">Welcome</Typography>
         <Box sx={{ display: "flex", gap: 2 }}>

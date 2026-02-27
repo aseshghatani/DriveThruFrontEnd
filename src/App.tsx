@@ -12,6 +12,8 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import MenuPage from "./pages/MenuPage";
 import HomePage from "./pages/HomePage";
 import Restaurant from "./pages/Restaurant";
+import Login from "./pages/Admin/Login";
+import AdminHome from "./pages/Admin/AdminHome";
 
 function App() {
   const theme = createTheme({
@@ -32,7 +34,6 @@ function App() {
     <>
       <ThemeProvider theme={theme}>
         <CssBaseline>
-          <Navbar />
           <Routes>
             <Route path="/send-otp" element={<Home />} />
             <Route path="/verify-otp" element={<VerifyOtp />} />
@@ -52,8 +53,17 @@ function App() {
                 </ProtectedRoute>
               }
             />
+            <Route path="/admin/login" element={<Login />} />
             <Route path="/restaurants" element={<Restaurant />} />
             <Route path="/menu" element={<MenuPage />} />
+            <Route
+              path="/admin"
+              element={
+                <ProtectedRoute>
+                  <AdminHome />
+                </ProtectedRoute>
+              }
+            />
           </Routes>
         </CssBaseline>
       </ThemeProvider>

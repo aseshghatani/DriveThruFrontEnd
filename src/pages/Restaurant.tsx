@@ -10,6 +10,7 @@ import {
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
+import Navbar from "../components/Navbar";
 
 // ✅ Type definitions
 interface RestaurantAddress {
@@ -68,71 +69,74 @@ export default function Restaurant() {
   }, [city]);
 
   return (
-    <Container sx={{ mt: 3 }}>
-      {/* Header */}
-      <Typography
-        variant="h4"
-        gutterBottom
-        sx={{ textTransform: "capitalize" }}
-      >
-        Restaurants in {city || "Unknown"}
-      </Typography>
+    <>
+      <Navbar />
+      <Container sx={{ mt: 3 }}>
+        {/* Header */}
+        <Typography
+          variant="h4"
+          gutterBottom
+          sx={{ textTransform: "capitalize" }}
+        >
+          Restaurants in {city || "Unknown"}
+        </Typography>
 
-      {/* Content */}
-      <Box
-        sx={{
-          display: "grid",
-          gridTemplateColumns: "repeat(3, 1fr)", // ✅ Better responsive
-          gap: 3,
-        }}
-      >
-        {loading ? (
-          <Box sx={{ display: "flex", justifyContent: "center", py: 8 }}>
-            <CircularProgress />
-          </Box>
-        ) : restaurants.length > 0 ? (
-          // ✅ Map over typed restaurants
-          restaurants.map((restaurant: Restaurant) => (
-            <Card key={restaurant.id} sx={{ cursor: "pointer" }}>
-              <CardActionArea>
-                <CardContent sx={{ p: 3 }}>
-                  <Typography variant="h6" gutterBottom>
-                    {restaurant.name}
-                  </Typography>
-                  <Typography
-                    variant="body2"
-                    color="text.secondary"
-                    sx={{ mb: 1 }}
-                  >
-                    {restaurant.restaurantAddress?.city},{" "}
-                    {restaurant.restaurantAddress?.address}
-                  </Typography>
-                  <Typography
-                    variant="body2"
-                    color="text.secondary"
-                    sx={{ mb: 2 }}
-                  >
-                    {restaurant.restaurantAddress?.landmark}
-                  </Typography>
-                  {restaurant.VegFriendly && (
-                    <Typography color="success.main" fontWeight="bold">
-                      🌿 Veg Friendly
+        {/* Content */}
+        <Box
+          sx={{
+            display: "grid",
+            gridTemplateColumns: "repeat(3, 1fr)", // ✅ Better responsive
+            gap: 3,
+          }}
+        >
+          {loading ? (
+            <Box sx={{ display: "flex", justifyContent: "center", py: 8 }}>
+              <CircularProgress />
+            </Box>
+          ) : restaurants.length > 0 ? (
+            // ✅ Map over typed restaurants
+            restaurants.map((restaurant: Restaurant) => (
+              <Card key={restaurant.id} sx={{ cursor: "pointer" }}>
+                <CardActionArea>
+                  <CardContent sx={{ p: 3 }}>
+                    <Typography variant="h6" gutterBottom>
+                      {restaurant.name}
                     </Typography>
-                  )}
-                </CardContent>
-              </CardActionArea>
-            </Card>
-          ))
-        ) : (
-          <Typography
-            variant="h6"
-            color="text.secondary"
-            sx={{ textAlign: "center", py: 8 }}
-          >
-            No restaurants found in {city || "your city"}
-          </Typography>
-        )}
-      </Box>
-    </Container>
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      sx={{ mb: 1 }}
+                    >
+                      {restaurant.restaurantAddress?.city},{" "}
+                      {restaurant.restaurantAddress?.address}
+                    </Typography>
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      sx={{ mb: 2 }}
+                    >
+                      {restaurant.restaurantAddress?.landmark}
+                    </Typography>
+                    {restaurant.VegFriendly && (
+                      <Typography color="success.main" fontWeight="bold">
+                        🌿 Veg Friendly
+                      </Typography>
+                    )}
+                  </CardContent>
+                </CardActionArea>
+              </Card>
+            ))
+          ) : (
+            <Typography
+              variant="h6"
+              color="text.secondary"
+              sx={{ textAlign: "center", py: 8 }}
+            >
+              No restaurants found in {city || "your city"}
+            </Typography>
+          )}
+        </Box>
+      </Container>
+    </>
   );
 }
