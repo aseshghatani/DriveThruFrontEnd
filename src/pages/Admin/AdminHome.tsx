@@ -1,8 +1,18 @@
-import { Box, Button, Container, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  Card,
+  CardActionArea,
+  CardContent,
+  Container,
+  Grid,
+  Typography,
+} from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { replace, useNavigate } from "react-router-dom";
 import AdminNavbar from "../../components/AdminNavbar";
-
+import axios from "axios";
+import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 interface User {
   username: string;
   name: string;
@@ -45,6 +55,24 @@ export default function AdminHome() {
     localStorage.removeItem("admin");
     localStorage.removeItem("adminToken");
   };
+
+  const handleRestaurant = async () => {
+    try {
+      const response = await axios("http://localhost:8080/restaurant/all");
+      if (response.data.success) {
+        navigate("/admin/restaurant", {
+          state: {
+            restaurant: response.data.data,
+          },
+        });
+      } else {
+        console.log(response.data.message);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <>
       <AdminNavbar />
@@ -59,8 +87,55 @@ export default function AdminHome() {
           </Button>
         </Box>
 
-        <Box>
-          
+        <Box sx={{ display: "flex", mt: 3, flexDirection: "column", gap: 3 }}>
+          <Card>
+            <CardActionArea
+              onClick={handleRestaurant}
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+              }}
+            >
+              <CardContent>
+                <Typography sx={{ cursor: "pointer" }} variant="h5">
+                  Restaurants
+                </Typography>
+              </CardContent>
+            </CardActionArea>
+          </Card>
+          <Card>
+            <CardActionArea
+              onClick={handleRestaurant}
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+              }}
+            >
+              <CardContent>
+                <Typography sx={{ cursor: "pointer" }} variant="h5">
+                  Users
+                </Typography>
+              </CardContent>
+            </CardActionArea>
+          </Card>
+          <Card>
+            <CardActionArea
+              onClick={handleRestaurant}
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+              }}
+            >
+              <CardContent>
+                <Typography sx={{ cursor: "pointer" }} variant="h5">
+                  Orders
+                </Typography>
+              </CardContent>
+            </CardActionArea>
+          </Card>
         </Box>
       </Container>
     </>

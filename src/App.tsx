@@ -14,6 +14,8 @@ import HomePage from "./pages/HomePage";
 import Restaurant from "./pages/Restaurant";
 import Login from "./pages/Admin/Login";
 import AdminHome from "./pages/Admin/AdminHome";
+import AdminRestaurant from "./pages/Admin/Restaurants/AdminRestaurant";
+import DataGridDemo from "./components/DataGridDemo";
 
 function App() {
   const theme = createTheme({
@@ -59,11 +61,20 @@ function App() {
             <Route
               path="/admin"
               element={
-                <ProtectedRoute>
+                <ProtectedRoute redirectTo="/admin/login">
                   <AdminHome />
                 </ProtectedRoute>
               }
             />
+            <Route
+              path="/admin/restaurant"
+              element={
+                <ProtectedRoute redirectTo="/admin/login">
+                  <AdminRestaurant />
+                </ProtectedRoute>
+              }
+            />
+            <Route path="/admin/trial" element={<DataGridDemo />} />
           </Routes>
         </CssBaseline>
       </ThemeProvider>
