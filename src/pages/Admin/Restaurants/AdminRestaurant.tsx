@@ -3,7 +3,7 @@ import { DataGrid, GridActionsCellItem } from "@mui/x-data-grid";
 import type { GridColDef } from "@mui/x-data-grid";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import EditIcon from "@mui/icons-material/Edit";
 import AdminNavbar from "../../../components/AdminNavbar";
 import AddIcon from "@mui/icons-material/Add";
@@ -26,6 +26,7 @@ interface Restaurant {
 export default function AdminRestaurant() {
   const location = useLocation();
   const [restaurants, setRestaurants] = useState<any[]>([]);
+  const navigate = useNavigate();
   const fetchRestaurants = async () => {
     axios
       .get("http://localhost:8080/restaurant/all")
@@ -109,10 +110,25 @@ export default function AdminRestaurant() {
               await fetchRestaurants();
             }}
           />
+          <Button
+            onClick={() => handleMenu(parms.row.id)}
+            variant="contained"
+            sx={{ bgcolor: "orange" }}
+          >
+            menu
+          </Button>
         </>
       ),
     },
   ];
+  const handleMenu = async (id: number) => {
+    const menu = await axios.get(`http://localhost:8080/menu/${id}`);
+    navigate(`/admin/restaurant/${id}/menu`, {
+      state: {
+        menu: menu.data.data,
+      },
+    });
+  };
   if (!restaurants.length) {
     return <Container sx={{ mt: 3 }}>Loading restaurants...</Container>;
   }
