@@ -17,6 +17,7 @@ import AdminHome from "./pages/Admin/AdminHome";
 import AdminRestaurant from "./pages/Admin/Restaurants/AdminRestaurant";
 import DataGridDemo from "./components/DataGridDemo";
 import AdminMenu from "./pages/Admin/Menu/AdminMenu";
+import Variant from "./pages/Admin/Menu/Variant";
 
 function App() {
   const theme = createTheme({
@@ -84,6 +85,7 @@ function App() {
               }
             />
             <Route path="/admin/trial" element={<DataGridDemo />} />
+            <Route path="/admin/menu/:id/variant" element={<Variant />} />
           </Routes>
         </CssBaseline>
       </ThemeProvider>

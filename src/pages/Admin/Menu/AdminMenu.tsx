@@ -1,7 +1,7 @@
-import { Box, Container } from "@mui/material";
+import { Box, Button, Container } from "@mui/material";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
-import { data, useLocation, useParams } from "react-router-dom";
+import { data, useLocation, useNavigate, useParams } from "react-router-dom";
 import AdminNavbar from "../../../components/AdminNavbar";
 import { DataGrid, type GridColDef } from "@mui/x-data-grid";
 import EditCreateMenu from "../../../components/Menu/EditCreateMenu";
@@ -21,6 +21,7 @@ export default function AdminMenu() {
   const restaurantId = id ? Number(id) : 0;
   const [menu, setMenu] = useState<MenuData[] | null>(null);
   const location = useLocation();
+  const navigate = useNavigate();
   const fetchMenuReload = async () => {
     axios
       .get(`http://localhost:8080/menu/${restaurantId}`)
@@ -44,7 +45,9 @@ export default function AdminMenu() {
 
     fetchMenu();
   }, [id]);
-
+  const handleVariant = (menuId: any) => {
+    navigate(`/admin/menu/${menuId}/variant`);
+  };
   const columns: GridColDef<(typeof menu)[number]>[] = [
     { field: "id", headerName: "ID", width: 90 },
 
@@ -72,22 +75,21 @@ export default function AdminMenu() {
       type: "actions",
       renderCell: (parms) => (
         <>
-          {
-            <EditCreateMenu
-              menuData={parms.row as MenuData}
-              onSave={async (data) => {
-                const response = await axios.put(
-                  `http://localhost:8080/menu/edit/${parms.id}`,
-                  data,
-                );
-                if (response.data.success) {
-                  fetchMenuReload();
-                } else {
-                  console.log(response.data.message);
-                }
-              }}
-            />
-          }
+          <EditCreateMenu
+            menuData={parms.row as MenuData}
+            onSave={async (data) => {
+              const response = await axios.put(
+                `http://localhost:8080/menu/edit/${parms.id}`,
+                data,
+              );
+              if (response.data.success) {
+                fetchMenuReload();
+              } else {
+                console.log(response.data.message);
+              }
+            }}
+          />
+
           <DeletePage
             name={parms.row.name}
             id={parms.row.id}
@@ -96,6 +98,9 @@ export default function AdminMenu() {
               await fetchMenuReload();
             }}
           />
+          <Button onClick={() => handleVariant(parms.row.id)}>
+            Variant/Addons
+          </Button>
         </>
       ),
     },
