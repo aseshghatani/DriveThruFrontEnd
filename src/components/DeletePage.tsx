@@ -27,7 +27,6 @@ export default function DeletePage({ onDelete, name, id }: DeleteProp) {
   const handleDelete = async (id) => {
     await onDelete(id);
     setOpen(false);
-    navigate("/admin/restaurant");
   };
   return (
     <>

@@ -5,6 +5,7 @@ import { data, useLocation, useParams } from "react-router-dom";
 import AdminNavbar from "../../../components/AdminNavbar";
 import { DataGrid, type GridColDef } from "@mui/x-data-grid";
 import EditCreateMenu from "../../../components/Menu/EditCreateMenu";
+import DeletePage from "../../../components/DeletePage";
 
 interface MenuData {
   id: number;
@@ -20,7 +21,7 @@ export default function AdminMenu() {
   const restaurantId = id ? Number(id) : 0;
   const [menu, setMenu] = useState<MenuData[] | null>(null);
   const location = useLocation();
-  const fetchRestaurants = async () => {
+  const fetchMenuReload = async () => {
     axios
       .get(`http://localhost:8080/menu/${restaurantId}`)
       .then((res) => setMenu(res.data.data || res.data))
@@ -69,7 +70,34 @@ export default function AdminMenu() {
       width: 150,
       flex: 1,
       type: "actions",
-      renderCell: (parms) => <>{/* <EditCreateMenu id={restaurantId} /> */}</>,
+      renderCell: (parms) => (
+        <>
+          {
+            <EditCreateMenu
+              menuData={parms.row as MenuData}
+              onSave={async (data) => {
+                const response = await axios.put(
+                  `http://localhost:8080/menu/edit/${parms.id}`,
+                  data,
+                );
+                if (response.data.success) {
+                  fetchMenuReload();
+                } else {
+                  console.log(response.data.message);
+                }
+              }}
+            />
+          }
+          <DeletePage
+            name={parms.row.name}
+            id={parms.row.id}
+            onDelete={async (id) => {
+              await axios.delete(`http://localhost:8080/menu/delete/${id}`);
+              await fetchMenuReload();
+            }}
+          />
+        </>
+      ),
     },
   ];
 
@@ -86,7 +114,7 @@ export default function AdminMenu() {
                 data,
               );
               if (response.data.success) {
-                fetchRestaurants();
+                fetchMenuReload();
                 console.log(response.data.message);
               }
             }}

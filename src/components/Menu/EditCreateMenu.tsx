@@ -22,13 +22,13 @@ interface MenuData {
 interface EditCreateMenuProps {
   menuData?: MenuData;
   onSave: (data: MenuData) => Promise<void>;
-  // optional, because this is primarily for Create
 }
 
 export default function EditCreateMenu({
   menuData,
   onSave,
-}: EditCreateMenuProps) {
+  children,
+}: React.PropsWithChildren<EditCreateMenuProps>) {
   const [open, setOpen] = useState(false);
 
   const [formValues, setFormValues] = useState<MenuData>({
@@ -38,6 +38,8 @@ export default function EditCreateMenu({
     sellingPrice: menuData?.sellingPrice ?? 0,
     retailPrice: menuData?.retailPrice ?? 0,
   });
+
+  const hasName = !!menuData?.name;
 
   const handleOpen = () => {
     setOpen(true);
@@ -102,7 +104,9 @@ export default function EditCreateMenu({
   return (
     <>
       <Button variant="contained" sx={{ mx: 3 }} onClick={handleOpen}>
-        Create
+        {hasName ? "Edit" : "Create"}
+
+        {children}
       </Button>
 
       <Dialog
@@ -112,13 +116,8 @@ export default function EditCreateMenu({
         aria-describedby="alert-dialog-description"
       >
         <DialogTitle id="alert-dialog-title">
-          Create Menu for Restaurant
+          {hasName ? `Edit Menu ${menuData.name}` : "Create Menu"}
         </DialogTitle>
-        <DialogContent>
-          <DialogContentText id="alert-dialog-description">
-            Delete Action is irreversable.
-          </DialogContentText>
-        </DialogContent>
 
         <form onSubmit={handleSubmit}>
           <DialogContent
@@ -185,7 +184,7 @@ export default function EditCreateMenu({
           <DialogActions>
             <Button onClick={handleClose}>Cancel</Button>
             <Button type="submit" variant="contained">
-              Create
+              {hasName ? "Save" : "Create"}
             </Button>
           </DialogActions>
         </form>
