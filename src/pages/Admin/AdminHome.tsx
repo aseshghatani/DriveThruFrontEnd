@@ -97,10 +97,17 @@ export default function AdminHome() {
                 justifyContent: "space-between",
               }}
             >
-              <CardContent>
+              <CardContent
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  width: "100%",
+                }}
+              >
                 <Typography sx={{ cursor: "pointer" }} variant="h5">
                   Restaurants
                 </Typography>
+                <ArrowForwardIcon />
               </CardContent>
             </CardActionArea>
           </Card>
@@ -113,10 +120,17 @@ export default function AdminHome() {
                 justifyContent: "space-between",
               }}
             >
-              <CardContent>
+              <CardContent
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  width: "100%",
+                }}
+              >
                 <Typography sx={{ cursor: "pointer" }} variant="h5">
                   Users
                 </Typography>
+                <ArrowForwardIcon />
               </CardContent>
             </CardActionArea>
           </Card>
@@ -126,13 +140,20 @@ export default function AdminHome() {
               sx={{
                 display: "flex",
                 alignItems: "center",
-                justifyContent: "space-between",
+                justifyContent: "start",
               }}
             >
-              <CardContent>
+              <CardContent
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  width: "100%",
+                }}
+              >
                 <Typography sx={{ cursor: "pointer" }} variant="h5">
                   Orders
                 </Typography>
+                <ArrowForwardIcon />
               </CardContent>
             </CardActionArea>
           </Card>
