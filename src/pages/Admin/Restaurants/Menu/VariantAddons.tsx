@@ -9,11 +9,15 @@ import {
   FormControlLabel,
   Radio,
   RadioGroup,
+  Snackbar,
+  Alert,
   Typography,
+  IconButton,
 } from "@mui/material";
 import React, { useState } from "react";
+import { getCart, saveCart } from "../../../../utils/cart";
 
-// Your interfaces (fixed VariantGroup)
+// Interfaces
 interface Variant {
   id: number;
   item_name: string;
@@ -23,7 +27,7 @@ interface Variant {
 interface VariantGroup {
   id: number;
   name: string;
-  variants: Variant[]; // ✅ Fixed: "variants" not "variant"
+  variants: Variant[];
 }
 
 interface AddOn {
@@ -39,10 +43,21 @@ interface AddOnGroup {
 }
 
 interface addOnVariantProp {
+  menuId: number;
   menuName: string;
   addOnGroup: AddOnGroup[];
   variantGroup: VariantGroup[];
   menuPrice: number;
+}
+
+interface AddonSelection {
+  name: string;
+  price: number;
+}
+
+interface VariantSelection {
+  name: string;
+  price: number;
 }
 
 interface OrderItem {
@@ -50,27 +65,48 @@ interface OrderItem {
   menu_id: number;
   menu_name: string;
   selections: {
-    addon: Addon[];
-    variant: Variant[];
+    addon: AddonSelection[];
+    variant: VariantSelection[];
   };
   unit_price: number;
   total_price: number;
   quantity: number;
-  createdAt: string;
-  updatedAt: string;
 }
 
-interface Addon {
-  name: string;
-  price: number;
+type Cart = OrderItem[];
+
+function addToCart(item: Omit<OrderItem, "id">): Cart {
+  const cart = getCart();
+
+  const existingIndex = cart.findIndex((cartItem: OrderItem) => {
+    const sameMenu = cartItem.menu_id === item.menu_id;
+    const sameVariants =
+      JSON.stringify(cartItem.selections.variant) ===
+      JSON.stringify(item.selections.variant);
+    const sameAddons =
+      JSON.stringify(cartItem.selections.addon) ===
+      JSON.stringify(item.selections.addon);
+    return sameMenu && sameVariants && sameAddons;
+  });
+
+  if (existingIndex !== -1) {
+    cart[existingIndex].quantity += 1;
+    cart[existingIndex].total_price =
+      cart[existingIndex].unit_price * cart[existingIndex].quantity;
+  } else {
+    const newItem: OrderItem = {
+      ...item,
+      id: Date.now(),
+    };
+    cart.push(newItem);
+  }
+
+  saveCart(cart);
+  return cart;
 }
 
-interface Variant {
-  name: string;
-}
-const CART_KEY = "cart";
-interface cart extends Array<OrderItem> {}
 export default function VariantAddons({
+  menuId,
   menuPrice,
   menuName,
   addOnGroup,
@@ -79,25 +115,33 @@ export default function VariantAddons({
   const [open, setOpen] = useState(false);
   const [selectedVariantId, setSelectedVariantId] = useState<number | null>(
     null,
-  ); // ✅ Use ID only
-  const [selectedAddons, setSelectedAddons] = useState<number[]>([]); // ✅ IDs only
+  );
+  const [selectedAddons, setSelectedAddons] = useState<number[]>([]);
+  const [snackbar, setSnackbar] = useState<{
+    open: boolean;
+    message: string;
+    severity: "success" | "error";
+  }>({ open: false, message: "", severity: "success" });
 
-  // ✅ Find selected variant & calculate total
+  const [quantity, setQuantity] = useState<number>(() => {
+    const cart = getCart();
+    const existing = cart.find((item: OrderItem) => item.menu_id === menuId);
+    return existing ? existing.quantity : 0;
+  });
+
   const selectedVariant = variantGroup
     .flatMap((g) => g.variants)
     .find((v) => v.id === selectedVariantId);
 
+  const selectedAddonItems = addOnGroup
+    .flatMap((g) => g.addOns)
+    .filter((a) => selectedAddons.includes(a.id));
+
   const totalPrice =
     (selectedVariant?.price ?? menuPrice) +
-    addOnGroup
-      .flatMap((g) => g.addOns.filter((a) => selectedAddons.includes(a.id)))
-      .reduce((sum, a) => sum + a.price, 0);
+    selectedAddonItems.reduce((sum, a) => sum + a.price, 0);
 
-  const handleOpen = () => {
-    console.log("Variant Group:", variantGroup);
-    console.log("AddOn Group:", addOnGroup);
-    setOpen(true);
-  };
+  const handleOpen = () => setOpen(true);
 
   const handleClose = () => {
     setOpen(false);
@@ -106,7 +150,6 @@ export default function VariantAddons({
   };
 
   const handleVariantChange = (variantId: number) => {
-    console.log("Variant selected:", variantId); // ✅ Debug
     setSelectedVariantId(variantId);
   };
 
@@ -118,11 +161,114 @@ export default function VariantAddons({
     );
   };
 
+  const handleDecrement = () => {
+    const cart = getCart();
+    const index = cart.findIndex((item: OrderItem) => item.menu_id === menuId);
+    if (index === -1) return;
+
+    if (cart[index].quantity === 1) {
+      cart.splice(index, 1);
+      setQuantity(0);
+    } else {
+      cart[index].quantity -= 1;
+      cart[index].total_price = cart[index].unit_price * cart[index].quantity;
+      setQuantity(cart[index].quantity);
+    }
+    saveCart(cart);
+  };
+
+  const handleConfirm = () => {
+    if (variantGroup.length > 0 && selectedVariantId === null) {
+      setSnackbar({
+        open: true,
+        message: "Please select a variant.",
+        severity: "error",
+      });
+      return;
+    }
+
+    const variantSelections: VariantSelection[] = selectedVariant
+      ? [{ name: selectedVariant.item_name, price: selectedVariant.price }]
+      : [];
+
+    const addonSelections: AddonSelection[] = selectedAddonItems.map((a) => ({
+      name: a.item_name,
+      price: a.price,
+    }));
+
+    const updatedCart = addToCart({
+      menu_id: menuId,
+      menu_name: menuName,
+      selections: {
+        variant: variantSelections,
+        addon: addonSelections,
+      },
+      unit_price: totalPrice,
+      total_price: totalPrice,
+      quantity: 1,
+    });
+
+    const inCart = updatedCart.find(
+      (item: OrderItem) => item.menu_id === menuId,
+    );
+    setQuantity(inCart ? inCart.quantity : 0);
+
+    setSnackbar({
+      open: true,
+      message: `${menuName} added to cart!`,
+      severity: "success",
+    });
+    handleClose();
+  };
+
   return (
     <>
-      <Button variant="outlined" color="success" onClick={handleOpen}>
-        Add
-      </Button>
+      {/* ADD BUTTON or +/- CONTROLS */}
+      {quantity === 0 ? (
+        <Button variant="outlined" color="success" onClick={handleOpen}>
+          Add
+        </Button>
+      ) : (
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            border: "1px solid",
+            borderColor: "success.main",
+            borderRadius: 1,
+            overflow: "hidden",
+            width: "fit-content",
+          }}
+        >
+          <IconButton
+            size="small"
+            color="success"
+            onClick={handleDecrement}
+            sx={{ borderRadius: 0, px: 1 }}
+          >
+            −
+          </IconButton>
+
+          <Typography
+            fontWeight={700}
+            color="success.main"
+            sx={{ px: 1.5, minWidth: "24px", textAlign: "center" }}
+          >
+            {quantity}
+          </Typography>
+
+          <IconButton
+            size="small"
+            color="success"
+            onClick={handleOpen}
+            sx={{ borderRadius: 0, px: 1 }}
+          >
+            +
+          </IconButton>
+        </Box>
+      )}
+
+      {/* DIALOG */}
       <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
         <DialogTitle sx={{ pb: 1 }} variant="h6">
           {menuName}
@@ -135,42 +281,37 @@ export default function VariantAddons({
         </Typography>
 
         <DialogContent sx={{ p: 3, pb: 2 }}>
-          {/* VARIANTS - Fixed RadioGroup */}
+          {/* VARIANTS */}
           {variantGroup?.map((group) => (
             <Box key={group.id} sx={{ mb: 3 }}>
               <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 1 }}>
                 {group.name}
               </Typography>
-
               <RadioGroup
-                value={selectedVariantId?.toString() || ""} // ✅ ID as string
+                value={selectedVariantId?.toString() || ""}
                 onChange={(e) => handleVariantChange(Number(e.target.value))}
               >
-                {group.variants?.map(
-                  (
-                    item, // ✅ "variants" plural
-                  ) => (
-                    <FormControlLabel
-                      key={item.id}
-                      value={item.id.toString()} // ✅ String value
-                      control={<Radio size="small" />}
-                      label={
-                        <Box
-                          sx={{
-                            display: "flex",
-                            justifyContent: "space-between",
-                            width: "100%",
-                          }}
-                        >
-                          <Typography>{item.item_name}</Typography>
-                          <Typography color="success.main">
-                            +₹{item.price}
-                          </Typography>
-                        </Box>
-                      }
-                    />
-                  ),
-                )}
+                {group.variants?.map((item) => (
+                  <FormControlLabel
+                    key={item.id}
+                    value={item.id.toString()}
+                    control={<Radio size="small" />}
+                    label={
+                      <Box
+                        sx={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          width: "100%",
+                        }}
+                      >
+                        <Typography>{item.item_name}</Typography>
+                        <Typography color="success.main">
+                          +₹{item.price}
+                        </Typography>
+                      </Box>
+                    }
+                  />
+                ))}
               </RadioGroup>
             </Box>
           ))}
@@ -228,12 +369,28 @@ export default function VariantAddons({
           <Button
             variant="contained"
             sx={{ bgcolor: "success.main", color: "white" }}
-            onClick={handleClose} // ✅ Add onAddToCart later
+            onClick={handleConfirm}
           >
-            Confirm
+            Add to Cart
           </Button>
         </DialogActions>
       </Dialog>
+
+      {/* Snackbar */}
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={3000}
+        onClose={() => setSnackbar((s) => ({ ...s, open: false }))}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <Alert
+          severity={snackbar.severity}
+          onClose={() => setSnackbar((s) => ({ ...s, open: false }))}
+          variant="filled"
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </>
   );
 }

@@ -18,6 +18,7 @@ import AdminRestaurant from "./pages/Admin/Restaurants/AdminRestaurant";
 import DataGridDemo from "./components/DataGridDemo";
 import AdminMenu from "./pages/Admin/Menu/AdminMenu";
 import Variant from "./pages/Admin/Menu/Variant";
+import CartPAge from "./pages/Admin/Menu/CartPAge";
 
 function App() {
   const theme = createTheme({
@@ -84,6 +85,7 @@ function App() {
                 </ProtectedRoute>
               }
             />
+            <Route path="/:id/cart" element={<CartPAge />} />
             <Route path="/admin/trial" element={<DataGridDemo />} />
             <Route path="/admin/menu/:id/variant" element={<Variant />} />
           </Routes>

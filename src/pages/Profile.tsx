@@ -134,68 +134,74 @@ export default function Profile() {
             Orders
           </Typography>
           <Box sx={{ mt: 3 }}>
-            {orderHistory?.map((orders) => (
-              <Accordion key={orders.id}>
-                <AccordionSummary
-                  expandIcon={<ExpandMoreIcon />}
-                  aria-controls="panel1-content"
-                  id="panel1-header"
-                >
-                  <Box sx={{ display: "flex", gap: 3, alignItems: "center" }}>
-                    <Typography component="span">
-                      order-id: #{orders.order_number}
-                    </Typography>
-                    <span
-                      style={{
-                        padding: 3,
-                        borderRadius: 5,
-                        color: "white",
-                        backgroundColor:
-                          orders.status === "PENDING"
-                            ? "#ff9900" // Orange
-                            : orders.status === "COMPLETED"
-                              ? "#09a7099f" // Green
-                              : "#f443369f", // Red for CANCELLED
-                      }}
-                    >
-                      {orders.status}
-                    </span>
-                  </Box>
-                </AccordionSummary>
-                <AccordionDetails>
-                  {orders.orderItems.map((items) => (
+            {orderHistory
+              ?.toSorted(
+                (a, b) =>
+                  new Date(b.createdAt).getTime() -
+                  new Date(a.createdAt).getTime(),
+              ) // ✅ Modern, doesn't mutate
+              .map((orders) => (
+                <Accordion key={orders.id}>
+                  <AccordionSummary
+                    expandIcon={<ExpandMoreIcon />}
+                    aria-controls="panel1-content"
+                    id="panel1-header"
+                  >
+                    <Box sx={{ display: "flex", gap: 3, alignItems: "center" }}>
+                      <Typography component="span">
+                        order-id: #{orders.order_number}
+                      </Typography>
+                      <span
+                        style={{
+                          padding: 3,
+                          borderRadius: 5,
+                          color: "white",
+                          backgroundColor:
+                            orders.status === "PENDING"
+                              ? "#ff9900" // Orange
+                              : orders.status === "COMPLETED"
+                                ? "#09a7099f" // Green
+                                : "#f443369f", // Red for CANCELLED
+                        }}
+                      >
+                        {orders.status}
+                      </span>
+                    </Box>
+                  </AccordionSummary>
+                  <AccordionDetails>
+                    {orders.orderItems.map((items) => (
+                      <Box
+                        sx={{
+                          display: "flex",
+                          gap: 5,
+                          width: "100%",
+                          justifyContent: "space-between",
+                        }}
+                        key={items.id}
+                      >
+                        <Typography>
+                          {items.menu_name} x{items.quantity}
+                        </Typography>
+                        <Typography>₹{items.total_price}</Typography>
+                      </Box>
+                    ))}
                     <Box
                       sx={{
-                        display: "flex",
-                        gap: 5,
                         width: "100%",
+                        display: "flex",
+                        alignItems: "center",
                         justifyContent: "space-between",
+                        borderTop: "1px solid gray",
+                        py: 2,
+                        mt: 2,
                       }}
-                      key={items.id}
                     >
-                      <Typography>
-                        {items.menu_name} x{items.quantity}
-                      </Typography>
-                      <Typography>₹{items.total_price}</Typography>
+                      <Typography>Total Amount:</Typography>
+                      <Typography>₹{orders.total_amount}</Typography>
                     </Box>
-                  ))}
-                  <Box
-                    sx={{
-                      width: "100%",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                      borderTop: "1px solid gray",
-                      py: 2,
-                      mt: 2,
-                    }}
-                  >
-                    <Typography>Total Amount:</Typography>
-                    <Typography>₹{orders.total_amount}</Typography>
-                  </Box>
-                </AccordionDetails>
-              </Accordion>
-            ))}
+                  </AccordionDetails>
+                </Accordion>
+              ))}
           </Box>
         </Box>
       </Container>

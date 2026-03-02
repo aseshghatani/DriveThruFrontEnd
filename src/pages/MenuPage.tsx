@@ -13,6 +13,7 @@ import {
 import axios from "axios";
 import { useLocation, useParams } from "react-router-dom";
 import VariantAddons from "./Admin/Restaurants/Menu/VariantAddons";
+import CartBtn from "../components/Menu/CartBtn";
 interface Menu {
   id: number;
   name: string;
@@ -91,6 +92,7 @@ export default function MenuPage() {
   return (
     <>
       <Navbar />
+      <CartBtn />
       <Box sx={{ height: "80px" }}></Box>
       <Container sx={{ mt: 3 }}>
         <Box sx={{ borderBottom: 2 }}>
@@ -174,12 +176,14 @@ export default function MenuPage() {
                 </Typography>
               )}
             </Box>
+
             <Box sx={{ mt: 3 }}>
               <VariantAddons
+                menuId={item.id}
                 menuPrice={item.sellingPrice}
                 addOnGroup={item.addOnGroups}
                 variantGroup={item.variantGroup}
-                menuName={`${item.name} • ${item.sellingPrice}`}
+                menuName={item.name}
               />
             </Box>
           </Box>

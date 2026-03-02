@@ -1,6 +1,7 @@
 import { Box, colors, Container, Typography } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import CartBtn from "./Menu/CartBtn";
 
 interface User {
   id: number;
