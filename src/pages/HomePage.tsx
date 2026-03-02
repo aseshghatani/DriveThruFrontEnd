@@ -6,32 +6,36 @@ import {
   Container,
   Typography,
 } from "@mui/material";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
+import axios from "axios";
+interface City {
+  name: string; // Changed from 'city' to 'name'
+}
 
 export default function HomePage() {
-  const city = [
-    {
-      name: "Kolkata",
-    },
-    {
-      name: "Mumbai",
-    },
-    {
-      name: "Delhi",
-    },
-    {
-      name: "Chennai",
-    },
-    {
-      name: "Bangalore",
-    },
-  ];
   const navigate = useNavigate();
-  const handleReq = (city: String) => {
-    navigate(`/restaurants?city=${city.toLocaleLowerCase()}`);
+  const [cities, setCities] = useState<string[] | null>(null); // Now string[]
+
+  useEffect(() => {
+    const fetchCity = async () => {
+      try {
+        const res = await axios.get("http://localhost:8080/restaurant/city");
+        if (res.data.success) {
+          setCities(res.data.data); // Direct array: ["Benagaluru", "Kolkata"]
+        }
+      } catch (error) {
+        console.log("API error:", error);
+      }
+    };
+    fetchCity();
+  }, []); // Remove 'city' dependency - causes infinite loop
+
+  const handleReq = (cityName: string) => {
+    navigate(`/restaurants?city=${cityName.toLowerCase()}`);
   };
+
   return (
     <>
       <Navbar />
@@ -43,10 +47,10 @@ export default function HomePage() {
             gap: 3,
           }}
         >
-          {city.map((city) => (
-            <Card>
+          {cities?.map((cityName, index) => (
+            <Card key={index}>
               <CardActionArea
-                onClick={() => handleReq(city.name)}
+                onClick={() => handleReq(cityName)} // Pass string directly
                 sx={{
                   maxWidth: 345,
                   aspectRatio: 1,
@@ -57,7 +61,7 @@ export default function HomePage() {
               >
                 <CardContent>
                   <Typography sx={{ cursor: "pointer" }} variant="h5">
-                    {city.name}
+                    {cityName} {/* Display string directly */}
                   </Typography>
                 </CardContent>
               </CardActionArea>
