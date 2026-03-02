@@ -34,7 +34,7 @@ interface VariantGroup {
   id: number;
   name: string;
   multiple_select: boolean;
-  addOns: Variant[];
+  variant: Variant[];
 }
 interface Variant {
   id: number;
@@ -111,7 +111,6 @@ export default function MenuPage() {
             <Box sx={{ flex: 1, mt: 2 }}>
               <Box>
                 {item.veg ? (
-                  // ✅ Veg (Green)
                   <Box
                     sx={{
                       border: "2px solid #0f8a44",
@@ -130,7 +129,6 @@ export default function MenuPage() {
                     />
                   </Box>
                 ) : (
-                  // ✅ Non-Veg (Red/Orange)
                   <Box
                     sx={{
                       border: "2px solid #ff4444", // Red border
@@ -154,7 +152,6 @@ export default function MenuPage() {
                 <Typography variant="h6" fontWeight="bold">
                   {item.name.toUpperCase()}
                 </Typography>
-                {/* Veg Badge */}
               </Box>
 
               <Box
@@ -179,6 +176,7 @@ export default function MenuPage() {
             </Box>
             <Box sx={{ mt: 3 }}>
               <VariantAddons
+                menuPrice={item.sellingPrice}
                 addOnGroup={item.addOnGroups}
                 variantGroup={item.variantGroup}
                 menuName={`${item.name} • ${item.sellingPrice}`}
