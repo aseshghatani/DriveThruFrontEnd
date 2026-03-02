@@ -39,6 +39,7 @@ export default function HomePage() {
   return (
     <>
       <Navbar />
+      <Box sx={{ height: "80px" }}></Box>
       <Container sx={{ mt: 3 }}>
         <Box
           sx={{

@@ -41,6 +41,7 @@ function Home() {
   return (
     <>
       <Navbar />
+      <Box sx={{ height: "80px" }}></Box>
       <Container sx={{ mt: 5, p: 2 }}>
         <Box>
           <Typography variant="h4">Login/Register</Typography>

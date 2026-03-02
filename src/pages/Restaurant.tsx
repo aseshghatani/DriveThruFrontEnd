@@ -9,7 +9,7 @@ import {
 } from "@mui/material";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import Navbar from "../components/Navbar";
 
 // ✅ Type definitions
@@ -35,12 +35,35 @@ interface ApiResponse {
   message: string;
   data: Restaurant[];
 }
+interface Menu {
+  id: number;
+  name: string;
+  veg: boolean;
+  available: boolean;
+  sellingPrice: number;
+  retailPrice: number;
+}
 
 export default function Restaurant() {
   const [searchParams] = useSearchParams();
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]); // ✅ Typed
   const [loading, setLoading] = useState<boolean>(true);
   const city: string | null = searchParams.get("city");
+  const navigate = useNavigate();
+  const handleMenu = async (id: number) => {
+    console.log("restaurant id:", id);
+    const response = await axios.get(`http://localhost:8080/menu/${id}`);
+    if (response.data.success) {
+      const menu: Menu = response.data.data;
+      navigate(`/restaurant/${id}/menu`, {
+        state: {
+          menu: menu,
+        },
+      });
+    } else {
+      console.log("error while requesting menu", response.data.message);
+    }
+  };
 
   useEffect(() => {
     const fetchData = async (): Promise<void> => {
@@ -71,6 +94,7 @@ export default function Restaurant() {
   return (
     <>
       <Navbar />
+      <Box sx={{ height: "80px" }}></Box>
       <Container sx={{ mt: 3 }}>
         {/* Header */}
         <Typography
@@ -97,7 +121,7 @@ export default function Restaurant() {
             // ✅ Map over typed restaurants
             restaurants.map((restaurant: Restaurant) => (
               <Card key={restaurant.id} sx={{ cursor: "pointer" }}>
-                <CardActionArea>
+                <CardActionArea onClick={() => handleMenu(restaurant.id)}>
                   <CardContent sx={{ p: 3 }}>
                     <Typography variant="h6" gutterBottom>
                       {restaurant.name}

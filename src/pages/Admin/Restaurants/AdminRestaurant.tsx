@@ -44,6 +44,19 @@ export default function AdminRestaurant() {
       .then((res) => setRestaurants(res.data.data || res.data))
       .catch(console.error);
   }, [location.state]);
+  const handleMenu = async (id: number) => {
+    const menu = await axios.get(`http://localhost:8080/menu/${id}`);
+    if (menu.data.success) {
+      navigate(`/admin/restaurant/${id}/menu`, {
+        state: {
+          menu: menu.data.data,
+        },
+      });
+    } else {
+      console.log("Error", menu.data.message);
+      navigate(`/admin/restaurant/${id}/menu`);
+    }
+  };
   const columns: GridColDef<(typeof restaurants)[number]>[] = [
     { field: "id", headerName: "ID", width: 90 },
 
@@ -121,14 +134,7 @@ export default function AdminRestaurant() {
       ),
     },
   ];
-  const handleMenu = async (id: number) => {
-    const menu = await axios.get(`http://localhost:8080/menu/${id}`);
-    navigate(`/admin/restaurant/${id}/menu`, {
-      state: {
-        menu: menu.data.data,
-      },
-    });
-  };
+
   if (!restaurants.length) {
     return <Container sx={{ mt: 3 }}>Loading restaurants...</Container>;
   }

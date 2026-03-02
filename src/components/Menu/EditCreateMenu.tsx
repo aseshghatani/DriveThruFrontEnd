@@ -17,6 +17,7 @@ interface MenuData {
   available: boolean;
   sellingPrice: number;
   retailPrice: number;
+  description: string;
 }
 
 interface EditCreateMenuProps {
@@ -37,6 +38,7 @@ export default function EditCreateMenu({
     available: menuData?.available ?? false,
     sellingPrice: menuData?.sellingPrice ?? 0,
     retailPrice: menuData?.retailPrice ?? 0,
+    description: menuData?.description ?? "",
   });
 
   const hasName = !!menuData?.name;
@@ -68,7 +70,10 @@ export default function EditCreateMenu({
       setFormValues({ ...formValues, retailPrice: Number(value) || 0 });
       return;
     }
-
+    if (name === "description") {
+      setFormValues({ ...formValues, description: value });
+      return;
+    }
     // for any non‑string field, keep default
     setFormValues({ ...formValues, [name]: value });
   };
@@ -112,6 +117,8 @@ export default function EditCreateMenu({
       <Dialog
         open={open}
         onClose={handleClose}
+        fullWidth
+        maxWidth="lg"
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >
@@ -123,7 +130,7 @@ export default function EditCreateMenu({
           <DialogContent
             sx={{
               display: "grid",
-              gridTemplateColumns: "repeat(3, 1fr)",
+              gridTemplateColumns: "repeat(2, 1fr)",
               gap: 2,
             }}
           >
@@ -176,6 +183,18 @@ export default function EditCreateMenu({
               label="Retail Price"
               type="number"
               value={formValues.retailPrice}
+              onChange={handleChange}
+              fullWidth
+            />
+            <TextField
+              required
+              margin="dense"
+              name="description"
+              label="Description"
+              multiline
+              rows={3}
+              type="text"
+              value={formValues.description}
               onChange={handleChange}
               fullWidth
             />

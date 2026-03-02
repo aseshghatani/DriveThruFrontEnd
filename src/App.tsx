@@ -59,7 +59,7 @@ function App() {
             />
             <Route path="/admin/login" element={<Login />} />
             <Route path="/restaurants" element={<Restaurant />} />
-            <Route path="/menu" element={<MenuPage />} />
+            <Route path="/restaurant/:id/menu" element={<MenuPage />} />
             <Route
               path="/admin"
               element={

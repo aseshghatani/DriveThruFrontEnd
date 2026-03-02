@@ -37,7 +37,16 @@ function Navbar() {
 
   return (
     <>
-      <Box sx={{ py: 2, bgcolor: "primary.main", color: "white" }}>
+      <Box
+        sx={{
+          width: "100vw",
+          top: "0",
+          py: 1,
+          bgcolor: "#ff5200",
+          color: "white",
+          position: "fixed",
+        }}
+      >
         <Container>
           <Box
             sx={{
